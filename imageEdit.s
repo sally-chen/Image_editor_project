@@ -1,4 +1,5 @@
 
+.global grayscale
 #pixel info is passed in as r4, 2 bytes (1)
 grayscale:
   subi sp,sp,16
@@ -13,23 +14,26 @@ grayscale:
   #r17 G
   srli r17,r4, 5
   andi r17, r17, 0x003F
-  muli r17, r17,3
+  muli r17, r17,6
   #r18 R
   srli r18, r4, 11
   andi r18, r18, 0x001F
-  muli r18, r18,3
+  muli r18, r18,4
   
   #add rgb and average by dividing by 3
   add r19, r16, r17
-  add r19, r18
-  movi r2, 3
+  add r19, r18, r19
+  movi r2, 14
   divu r19, r19, r2
   
+  movi r2, 31
+  bgt r19, r2, TooDark
   #concaternate-> r19r19r19
+Back:
   mov r2,r19
-  slli r2, 6
+  slli r2, r2, 5
   or r2,r19,r2
-  slli r2, 5
+  slli r2,r2, 6
    or r2,r19,r2
  
   ldw  r16, 0(sp)
@@ -37,12 +41,18 @@ grayscale:
   ldw  r18, 8(sp)
   ldw  r19, 12(sp)
   addi sp,sp,16
-  
+
+	
   #return r2, 16 bits
   ret
+
+TooDark:
+  movi r19,31
+  br Back
   
 #pixel info is passed in as r4, 2 bytes (1)
 #how much brightness is in r5
+.global brighten
 brighten:
   subi sp,sp,32
   stw ra, 0(sp)
@@ -59,10 +69,10 @@ brighten:
   
    #r16 B
   andi r16, r19, 0x001F
-  addi r16, r16, r20
+  add r16, r16, r20
   
   mov r4,r16
-  mov r5, 32
+  movi r5, 31
   call checkbound 
   mov r16,r4
   
@@ -73,7 +83,7 @@ brighten:
   add  r17, r17,r20
   
   mov r4,r17
-  mov r5, 64
+  movi r5, 63
   call checkbound 
   mov r17,r4
   
@@ -84,15 +94,15 @@ brighten:
   add  r18, r18, r20
   
   mov r4,r18
-  mov r5, 64
+  movi r5, 31
   call checkbound 
   mov r18,r4
   
   #concaternate-> r19r19r19
   mov r2,r18
-  slli r2, 6
+  slli r2,r2, 6
   or r2,r17,r2
-  slli r2, 5
+  slli r2,r2, 5
   or r2,r16,r2
    
    
@@ -109,22 +119,21 @@ brighten:
  ret
  
  
+.global checkbound
 checkbound:
-  blt r4, 0, lessThanZero
-  bgt r4,r5, higherThanBound
-  
-  lessThanZero:
-  mov r4, 0 
-  br retu
-  
-  higherThanBound:
-  mov r4,r5
-  br retu  
+  blt r4, r0, lessThanZero
+  bgt r4,r5, higherThanBound  
  
  retu:
  ret
   
- 
+  lessThanZero:
+  movi r4, 0 
+  br retu
+  
+  higherThanBound:
+  mov r4,r5
+  br retu 
   
   
   
