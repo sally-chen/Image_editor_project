@@ -11,7 +11,8 @@ myfile:
  movia r16, ADDR_VGA
 movia r17, myfile
 #go past header
-addi r17, r17, 70
+addi r17, r17, 10
+movi r18, 0
 movi r21, 240
 Loop:
 movi r19, 320
@@ -29,13 +30,12 @@ sthio r20, 0(r16)
 #subtract it
 sub r16, r16, r7
 addi r17, r17, 2
+subi r19, r19, 1
+bne r19, r0, Loop2
 
-addi r9, r9, 1
-bne r9, r19, Loop2
-
+addi r18, r18, 1
 subi r21, r21, 1
 bne r21, r0, Loop
  #stuff here
-loop:
-br loop
+ end
  
