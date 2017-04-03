@@ -135,6 +135,47 @@ checkbound:
   mov r4,r5
   br retu 
   
+#r4 pixel value, r5 degree of contrast being added
+#f(x)=α(x−128)+128+b 
+.global contrast
+contrast:
+
+  subi sp,sp,16
+  stw  r16, 0(sp)
+  stw  r17, 4(sp)
+  stw  r18, 8(sp)
+  stw  r19, 12(sp)
   
+  #r16 B
+  andi r16, r4, 0x001F
+  subi r16, r16, 32
+  mul r16, r16,r5
+  addi r16, r16, 32
   
+  #r17 G
+  srli r17,r4, 5
+  andi r17, r17, 0x003F
+  subi r17, r17, 64
+  mul r17, r17,r5
+  addi r17, r17, 64
   
+  #r18 R
+  srli r18, r4, 11
+  andi r18, r18, 0x001F
+  subi r18, r18, 32
+  mul r18, r18,r5
+  addi r18, r18, 32
+  
+  mov r2,r18
+  slli r2,r2, 6
+  or r2,r17,r2
+  slli r2,r2, 5
+  or r2,r16,r2
+  
+  ldw  r16, 0(sp)
+  ldw  r17, 4(sp)
+  ldw  r18, 8(sp)
+  ldw  r19, 12(sp)
+  addi sp,sp,16
+  
+  ret
