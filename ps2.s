@@ -27,17 +27,15 @@ myfile:
 .incbin "duck.bmp"
 #to keep track of mouse position
  MousePosition:
- .skip 4
+ .skip 8
  
  .text
  .global _start
  _start:
  #irq line 7
  call InitMouse
- movi r10 0b1000000
- movi r11 0b01
- wrctl ctl3, r10
- wrctl ctl0, r11
+
+ 
  
  movia r10, MousePosition
  movi r9, 120
@@ -54,6 +52,11 @@ myfile:
  #set bit 0 to enable controls
  movi r11, 0b1
  stwio r11, 4(r10)
+ movi r10 0b1000000
+ movi r11 0b01
+ wrctl ctl3, r10
+ wrctl ctl0, r11
+ 
  ret
  
 drawBuffer:
