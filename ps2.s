@@ -25,6 +25,20 @@
  
 myfile:
 .incbin "duck.bmp"
+
+blackAndWhite:
+.incbin "BandW.bmp"
+Contrast:
+.incbin "contrast.bmp"
+Brighten:
+.incbin "brighten.bmp"
+
+positionBW:
+.word 0 .word 0 . word 19 .word 19
+positionContrast:
+.word 0 .word 19 . word 19 .word 39
+positionBrighten:
+.word 0 .word 39 . word 19 .word 59
 #to keep track of mouse position
  MousePosition:
  .skip 8
@@ -33,17 +47,18 @@ myfile:
  .global _start
  _start:
  #irq line 7
- call InitMouse
+ 
 
  
  
  movia r10, MousePosition
  movi r9, 120
- movi r8, 160
  sth r9, 0(r10)
- sth r8, 2(r10)
+ movi r9, 160
+ sth r9, 4(r10)
  
  call load_buffer
+ call InitMouse
  loop:
  br loop
  
@@ -68,7 +83,8 @@ ret
  handler:
  subi sp, sp, 4
  stw ea, 0(sp)
- movia r10, 0xFF200100 
+ 
+ movia r10, ADDR_PS2 
  movia r13, MousePosition
  ldw r11, 4(r10)
  #check for errors - bit 10
@@ -80,25 +96,50 @@ ret
  #check data is valid - bit 15
  andi r12, r11, 0x8000
  bne r12, r0, done
+ andi r12, r11, 0x1
+
  
  #store x and y movement
  ldw r11, 0(r10)
- ldh r14, 0(r13)
+ ldw r14, 0(r13)
  add r11, r11, r14
- sth r11, 0(r13)
+ stw r11, 0(r13)
  
  ldw r11, 0(r10)
- ldh r14, 2(r13)
+ ldw r14, 4(r13)
  add r11, r11, r14
- sth r11, 2(r13)
+ stw r11, 4(r13)
  
  call draw_buffer
  call draw_mouse
  
+ beq r12, r0, done
+ldw r12, 0(r13)
+ldw r14, 4(r13)
+
+movi r15, 19
+bgt r14, r15, done
+movi r15, 59
+bgt r12, r15, done
+movi r15, 39
+blt r12, r15, bright
+movi r15, 19
+blt r12, r15, contrast1
+
+call greyscale
+br done
+bright:
+call brighten
+br done
+contrast1:
+call contrast
+br done
+
  done:
   ldw ea, 0(sp)
   addi sp, sp, 4
  subi ea, ea, 4
+ 
  eret
  
 
@@ -147,9 +188,6 @@ movi r9, 0
 Loop2:
 #print out 1 pixel location = x*2 + 1024*y
 ldh r20, 0(r17)
-#multiply 2*r9
-#add this value to r16
-
 
 sthio r20, 0(r16)
 #subtract it
