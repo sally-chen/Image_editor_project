@@ -6,6 +6,7 @@ Katherine and Sally tested VGA code, managed to display bmp on screen
 April 2nd:
 Katherine wrote code for ps2 mouse
 Sally created brighten, greyscale and contrast subroutines, tested brighten and greyscale
+Sally and Katherine compiled both parts of code into working copy
 
 April 4th: 
 Katherine edited code to add buttons being drawn
