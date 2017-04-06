@@ -1,2 +1,14 @@
 Change log:
-April 4th: Katherine edited code to add buttons being drawn
+
+March 30:
+Katherine and Sally tested VGA code, managed to display bmp on screen
+
+April 2nd:
+Katherine wrote code for ps2 mouse
+Sally created brighten, greyscale and contrast subroutines, tested brighten and greyscale
+
+April 4th: 
+Katherine edited code to add buttons being drawn
+
+April 5th:
+Sally merged image processing subroutines with mouse
