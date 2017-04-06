@@ -249,4 +249,96 @@ addi r9, r9, 1
 bne r19, r15, loopMouse1
 
 ret
+
+drawButtons:
+movia r16, ADDR_VGA
+movia r11, blackAndWhite
+
+addi r11, r11, 70
+
+movi r12, 20
+movi r8, 0
+Loop:
+movi r9, 0
+Loop2:
+#print out 1 pixel location = x*2 + 1024*y
+ldh r20, 0(r11)
+#multiply 2*r9
+muli r6, r9, 2
+muli r7, 8, 1024
+add r7, r7, r6
+#add this value to r16
+add r16, r16, r7
+sthio r20, 0(r16)
+#subtract it
+sub r16, r16, r7
+addi r11, r11, 2
+
+addi r9, r9, 1
+bne r9, r12, Loop2
+
+addi r8, r8, 1
+bne r12, r8, Loop
+
+
+movia r11, Contrast
+
+addi r11, r11, 70
+
+movi r12, 40
+movi r8, 20
+Loop:
+movi r13, 20
+movi r9, 0
+Loop2:
+#print out 1 pixel location = x*2 + 1024*y
+ldh r20, 0(r11)
+#multiply 2*r9
+muli r6, r9, 2
+muli r7, 8, 1024
+add r7, r7, r6
+#add this value to r16
+add r16, r16, r7
+sthio r20, 0(r16)
+#subtract it
+sub r16, r16, r7
+addi r11, r11, 2
+
+addi r9, r9, 1
+bne r9, r13, Loop2
+
+addi r8, r8, 1
+bne r12, r8, Loop
+
+movia r11, Brighten
+
+addi r11, r11, 70
+
+movi r12, 60
+movi r8, 40
+Loop:
+movi r13, 20
+movi r9, 0
+Loop2:
+#print out 1 pixel location = x*2 + 1024*y
+ldh r20, 0(r11)
+#multiply 2*r9
+muli r6, r9, 2
+muli r7, 8, 1024
+add r7, r7, r6
+#add this value to r16
+add r16, r16, r7
+sthio r20, 0(r16)
+#subtract it
+sub r16, r16, r7
+addi r11, r11, 2
+
+addi r9, r9, 1
+bne r9, r13, Loop2
+
+addi r8, r8, 1
+bne r12, r8, Loop
+
+ret
+
  
