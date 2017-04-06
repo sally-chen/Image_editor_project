@@ -57,6 +57,7 @@ positionBrighten:
  movi r9, 160
  sth r9, 4(r10)
  
+ movi r6, 0 #mode passed to load buffer
  call load_buffer
  call InitMouse
  loop:
@@ -126,13 +127,20 @@ blt r12, r15, bright
 movi r15, 19
 blt r12, r15, contrast1
 
-call greyscale
+greyscale:
+movi r6, 1
+call load_buffer
+call draw_buffer
 br done
 bright:
-call brighten
+movi r6, 2
+call load_buffer
+call draw_buffer
 br done
 contrast1:
-call contrast
+movi r6, 3
+call load_buffer
+call draw_buffer
 br done
 
  done:
@@ -189,6 +197,12 @@ Loop2:
 #print out 1 pixel location = x*2 + 1024*y
 ldh r20, 0(r17)
 
+#process image, if mode is 0 then original image
+beq r6, 1, BW_mode
+beq r6, 2, Brighten_mode
+beq r6, 3, Contrast_mode
+
+Buffer_Back:
 sthio r20, 0(r16)
 #subtract it
 addi r20, r20, 2
@@ -201,6 +215,28 @@ subi r21, r21, 1
 bne r21, r0, Loop
 
 ret
+
+BW_mode:
+  mov r4,r20
+  call grayscale
+  mov r20,r2
+  br Buffer_Back
+
+Brighten_mode:
+  #process image
+  mov r4,r20
+  movi r5, 6
+  call brighten
+  mov r20,r2
+  br Buffer_Back
+
+Contrast_mode:
+  mov r4,r20
+  movi r5, 3 
+  call brighten
+  mov r20,r2
+  br Buffer_Back
+  
 
 draw_mouse:
 movia r11, ADDR_VGA
