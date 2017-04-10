@@ -1,3 +1,16 @@
+filter_blur:
+#row 0
+.byte 0,0,1,0,0
+#row 1
+.byte 0,1,1,1,0
+#row 2
+.byte 1,1,1,1,1
+#row 3
+.byte 0,1,1,1,0
+#row 4
+.byte 0,0,1,0,0
+
+
 
 .global grayscale
 #pixel info is passed in as r4, 2 bytes (1)
@@ -179,3 +192,122 @@ contrast:
   addi sp,sp,16
   
   ret
+  
+  
+#r9 is the current location---------------------------filter------------------------------------------------------
+#r4 is   
+.global filter
+filter:
+
+#save ra, r23-r13,
+subi sp,sp,48
+stw  ra, 0(sp)
+stw  r13, 4(sp)
+stw  r14, 8(sp)
+stw  r15, 12(sp)
+stw  r16, 16(sp)
+stw  r17, 20(sp)
+stw  r18, 24(sp)
+stw  r19, 28(sp)
+stw  r20, 32(sp)
+stw  r21, 36(sp)
+stw  r22, 40(sp)
+stw  r23, 44(sp)
+  
+movia r21, filter_blur
+#initialize r20
+movi r20, 0 #b
+movi r19, 0 #g
+movi r18, 0 #r
+
+#r4-> left top position of image sample corresponding to filter matrix
+subi r4,r5,1284
+
+
+#counter outside
+movi r22, 5
+LoopY:
+#counter inside
+movi r23, 5
+
+LoopX: 
+#read from filter
+ldb r17,0(r21)
+#read from pixel
+ldh r16, 0(r4)
+#-------------how do you wrap around...?
+
+#extract r,g,b value from pixel, multiply and sum 
+#r15 B
+andi r15, r4, 0x001F
+mul r15, r15, r17
+add r20,r20,r15
+#r14 G
+srli r14,r4, 5
+andi r14, r14, 0x003F
+mul r14, r14, r17
+add r19,r19,r14
+#r13 R
+srli r13, r4, 11
+andi r13, r13, 0x001F
+mul r13, r13, r17
+add r18,r18,r13
+
+#increment filter pointer
+addi r21, r21, 1
+#increment image sample pointer
+addi r4, r4, 2
+
+#decrement inside loop counter
+subi r23, r23,1
+bgt r23,r0, LoopX
+
+addi r4, r4, 632
+subi r22, r22,1
+bgt r22,r0, LoopY
+
+#divide each pixel value by total of filter value
+movi r2, 13
+divu r20, r20, r2
+divu r19, r19, r2
+divu r18, r18, r2
+
+#check bound
+mov r4,r20
+movi r5, 31
+call checkbound 
+mov r20,r4
+
+mov r4,r19
+movi r5, 63
+call checkbound 
+mov r19,r4
+
+mov r4,r18
+movi r5, 31
+call checkbound 
+mov r18,r4
+
+#concaternate
+mov r2,r18
+slli r2,r2, 6
+or r2,r19,r2
+slli r2,r2, 5
+or r2,r20,r2
+
+
+ldw  ra, 0(sp)
+ldw  r13, 4(sp)
+ldw  r14, 8(sp)
+ldw  r15, 12(sp)
+ldw  r16, 16(sp)
+ldw  r17, 20(sp)
+ldw  r18, 24(sp)
+ldw  r19, 28(sp)
+ldw  r20, 32(sp)
+ldw  r21, 36(sp)
+ldw  r22, 40(sp)
+ldw  r23, 44(sp)
+addi sp,sp,48
+
+ret
