@@ -216,9 +216,9 @@ stw  r23, 44(sp)
   
 movia r21, filter_blur
 #initialize r20
-movi r20, 0 #b
+movi r18, 0 #b
 movi r19, 0 #g
-movi r18, 0 #r
+movi r20, 0 #r
 
 #r4-> left top position of image sample corresponding to filter matrix
 subi r4,r5,1284
@@ -239,19 +239,19 @@ ldh r16, 0(r4)
 
 #extract r,g,b value from pixel, multiply and sum 
 #r15 B
-andi r15, r4, 0x001F
-mul r15, r15, r17
-add r20,r20,r15
+andi r13, r16, 0x001F
+mul r13, r13, r17
+add r18,r18,r15
 #r14 G
-srli r14,r4, 5
+srli r14,r16, 5
 andi r14, r14, 0x003F
 mul r14, r14, r17
 add r19,r19,r14
 #r13 R
-srli r13, r4, 11
-andi r13, r13, 0x001F
-mul r13, r13, r17
-add r18,r18,r13
+srli r15, r16, 11
+andi r15, r15, 0x001F
+mul r15, r15, r17
+add r20,r20,r13
 
 #increment filter pointer
 addi r21, r21, 1
@@ -289,11 +289,11 @@ call checkbound
 mov r18,r4
 
 #concaternate
-mov r2,r18
+mov r2,r20
 slli r2,r2, 6
 or r2,r19,r2
 slli r2,r2, 5
-or r2,r20,r2
+or r2,r18,r2
 
 
 ldw  ra, 0(sp)

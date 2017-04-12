@@ -281,6 +281,7 @@ ldw r9, 12(sp)
 ldw r10, 8(sp)
 ldw r11, 4(sp)
 ldw r12, 0(sp)
+
 sthio r13, 0(r8)
 addi sp, sp, 28
 #subtract it
